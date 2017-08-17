@@ -105,7 +105,7 @@ void DUChainControlFlow::generateControlFlowForDeclaration(IndexedDeclaration id
     Declaration *definition = idefinition.data();
     if (!definition)
         return;
-    
+
     TopDUContext *topContext = itopContext.data();
     if (!topContext)
         return;
@@ -125,7 +125,7 @@ void DUChainControlFlow::generateControlFlowForDeclaration(IndexedDeclaration id
     if (m_maxLevel != 1 && !m_visitedFunctions.contains(idefinition) && nodeDefinition && nodeDefinition->internalContext())
     {
         m_dotControlFlowGraph->foundRootNode(containers, (m_controlFlowMode == ControlFlowNamespace &&
-                                        nodeDefinition->internalContext() && nodeDefinition->internalContext()->type() != DUContext::Namespace) ? 
+                                        nodeDefinition->internalContext() && nodeDefinition->internalContext()->type() != DUContext::Namespace) ?
                                                                           globalNamespaceOrFolderNames(nodeDefinition):
                                                                           shortName);
         ++m_currentLevel;
@@ -195,9 +195,9 @@ void DUChainControlFlow::cursorPositionChanged(KTextEditor::View *view, const KT
         if (context && context->type() == DUContext::Function && context->importers().size() == 1)
             context = context->importers()[0];
 
-        Declaration *declarationUnderCursor = DUChainUtils::itemUnderCursor(view->document()->url(), cursor);
-        if (declarationUnderCursor && (!context || context->type() != DUContext::Other) && declarationUnderCursor->internalContext())
-            context = declarationUnderCursor->internalContext();
+        auto declarationUnderCursor = DUChainUtils::itemUnderCursor(view->document()->url(), cursor);
+        if ( (!context || context->type() != DUContext::Other) && declarationUnderCursor.context )
+            context = declarationUnderCursor.context;
 
         if (!context || context->type() != DUContext::Other)
         {
@@ -308,7 +308,7 @@ void DUChainControlFlow::processFunctionCall(Declaration *source, Declaration *t
     }
 
     IndexedDeclaration ideclaration = IndexedDeclaration(calledFunctionDefinition);
-    m_dotControlFlowGraph->foundFunctionCall(sourceContainers, sourceLabel, targetContainers, targetLabel); 
+    m_dotControlFlowGraph->foundFunctionCall(sourceContainers, sourceLabel, targetContainers, targetLabel);
 
     if (calledFunctionDefinition)
         calledFunctionContext = calledFunctionDefinition->internalContext();
@@ -347,7 +347,7 @@ void DUChainControlFlow::updateToolTip(const QString &edge, const QPoint& point,
 {
     ControlFlowGraphNavigationWidget *navigationWidget =
                 new ControlFlowGraphNavigationWidget(edge, m_arcUsesMap.values(edge));
-    
+
     KDevelop::NavigationToolTip *usesToolTip = new KDevelop::NavigationToolTip(
                                   partWidget,
                                   point,
@@ -364,18 +364,18 @@ void DUChainControlFlow::slotGraphElementSelected(QList<QString> list, const QPo
     {
         QString label = list[0];
         Declaration *declaration = m_identifierDeclarationMap[label].data();
-        
+
         DUChainReadLocker lock(DUChain::lock());
-        
+
         if (declaration) // Node click, jump to definition/declaration
         {
             QUrl url = QUrl::fromLocalFile(declaration->url().str());
             CursorInRevision cursor = declaration->range().start;
             int line = cursor.line;
             int column = cursor.column;
-            
+
             lock.unlock();
-            
+
             ICore::self()->documentController()->openDocument(url, KTextEditor::Cursor(line, column));
         }
     }
@@ -548,7 +548,7 @@ void DUChainControlFlow::prepareContainers(QStringList &containers, Declaration*
     {
         m_controlFlowMode = ControlFlowClass;
         Declaration *classDefinition = declarationFromControlFlowMode(definition);
-        
+
         if (classDefinition->internalContext() && classDefinition->internalContext()->type() == DUContext::Class)
             containers << shortNameFromContainers(containers, prependFolderNames(classDefinition));
     }
@@ -597,7 +597,7 @@ QString DUChainControlFlow::prependFolderNames(Declaration *declaration)
         m_controlFlowMode = originalControlFlowMode;
 
         QString prefix = globalNamespaceOrFolderNames(namespaceDefinition);
-        
+
         if (namespaceDefinition && namespaceDefinition->internalContext() &&
             namespaceDefinition->internalContext()->type() != DUContext::Namespace &&
             prefix != i18n("Global Namespace"))
