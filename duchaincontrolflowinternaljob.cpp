@@ -35,7 +35,7 @@ DUChainControlFlowInternalJob::~DUChainControlFlowInternalJob()
 
 void DUChainControlFlowInternalJob::setControlFlowJobType(DUChainControlFlowInternalJob::ControlFlowJobType controlFlowJobType)
 {
-    m_controlFlowJobType = controlFlowJobType;   
+    m_controlFlowJobType = controlFlowJobType;
 }
 
 void DUChainControlFlowInternalJob::requestAbort()
@@ -47,7 +47,7 @@ void DUChainControlFlowInternalJob::requestAbort()
     }
 }
 
-void DUChainControlFlowInternalJob::run(ThreadWeaver::JobPointer self, ThreadWeaver::Thread *thread)
+void DUChainControlFlowInternalJob::run(ThreadWeaver::JobPointer /*self*/, ThreadWeaver::Thread */*thread*/)
 {
     qDebug() << Q_FUNC_INFO << "LOL";
     switch(m_controlFlowJobType)
